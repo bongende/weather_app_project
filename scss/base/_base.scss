@@ -1,0 +1,64 @@
+@use 'sass:math';
+
+* {
+    margin : 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    background-color: $background-color;
+    background-image: url("../img/clouds.jpg");
+    background-size : cover;
+    background-blend-mode : overlay;
+    font: 1rem 'Montserrat',sans-serif;
+    font-weight : bold;
+    letter-spacing : 1px;
+    color : $font-color;
+    @include mq(math.div(768, 16) + rem) {
+        font-size : math.div(22, 16) + rem;
+    }
+}
+
+body {
+    width : 100%;
+    min-height : 100vh;
+    @include flexCenter;
+    flex-direction : column;
+    padding : .5rem;
+}
+
+main {
+    width : 100%;
+    max-width: math.div(700, 16) + rem;
+    max-height : math.div(1050, 16) + rem;
+    display : flex;
+    flex-direction : column;
+    flex-grow : 1;
+    color : $font-color;
+    background-color: $mask-color;
+    border: .16rem solid $bordercolor;
+    border-radius: math.div(10, 16) + em;
+    box-shadow : 1px 1px 2.5px$shadowcolor;
+
+}
+
+img {
+    display : block;
+
+}
+
+hr {
+    width : 90%;
+    margin : auto;
+    border : 1px solid $bordercolor;
+}
+
+.none {
+    display : none;
+}
+
+.block {
+    display : block;
+}
+
