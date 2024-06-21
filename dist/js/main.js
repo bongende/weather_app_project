@@ -158,7 +158,6 @@ const submitNewLocation = async (event) => {
 const updateDataAndDisplay = async (locationObj) => {
   if (locationObj instanceof CurrentLocation) {
     const weatherJson = await getWeatherFromCoords(locationObj);
-    console.log("in updateDataAndDisplay", weatherJson);
     if (weatherJson) updateDisplay(weatherJson, locationObj);
   } else {
     const loc = new CurrentLocation();
@@ -166,7 +165,6 @@ const updateDataAndDisplay = async (locationObj) => {
     loc.setLon(locationObj.city.coord.lon);
     loc.setName(`Lat:${loc.getLat()} Lon:${loc.getLon()}`);
     const weatherJson = await getWeatherFromCoords(loc);
-    console.log("uptd locationObj", weatherJson);
     if (weatherJson) updateDisplay(weatherJson, loc);
   }
 };
