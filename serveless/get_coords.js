@@ -3,12 +3,12 @@ const WEATHER_API_KEY = process.env;
 
 exports.handler = async (event, context) => {
   const params = JSON.parse(event.body);
-  const { text, units } = params;
+  const { text, unit } = params;
 
   const regex = /^\d+$/g;
   const flag = regex.text(text) ? "zip" : "q";
 
-  const url = `http://api.openweathermap.org/data/2.5/weather?${flag}=${entryText}&units=${units}id=524901&appid=${WEATHER_API_KEY}`;
+  const url = `http://api.openweathermap.org/data/2.5/weather?${flag}=${entryText}&units=${unit}id=524901&appid=${WEATHER_API_KEY}`;
   const encodedUrl = encodeURI(url);
   try {
     const dataStream = await fetch(encodedUrl);
