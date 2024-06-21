@@ -6,7 +6,7 @@ exports.handler = async (event, context) => {
   const { text, unit } = params;
 
   const regex = /^\d+$/g;
-  const flag = regex.text(text) ? "zip" : "q";
+  const flag = regex.test(text) ? "zip" : "q";
 
   const url = `http://api.openweathermap.org/data/2.5/weather?${flag}=${entryText}&units=${unit}id=524901&appid=${WEATHER_API_KEY}`;
   const encodedUrl = encodeURI(url);
@@ -15,7 +15,6 @@ exports.handler = async (event, context) => {
     const jsonData = await dataStream.json();
     return {
       statusCode: 200,
-
       body: JSON.stringify(jsonData),
     };
   } catch (err) {
