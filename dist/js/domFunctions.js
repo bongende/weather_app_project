@@ -49,6 +49,7 @@ export const updateScreenReaderConfirmation = (message) => {
 };
 
 export const updateDisplay = (weatherJson, locationObj) => {
+  console.log(weatherJson);
   fadeDisplay();
   clearDisplay();
   const weatherClass = getWeatherClalss(weatherJson.list[0].weather[0].icon); // maybe weatherJson.current.weather[0].icon  )
@@ -58,7 +59,16 @@ export const updateDisplay = (weatherJson, locationObj) => {
     weatherJson,
     locationObj
   );
-
+  updateScreenReaderConfirmation(screenReaderWeather);
+  updateWeatherLocationHeader(locationObj.getName());
+  //current condition to disp
+  const ccARay = createCurrentConditionDivis(
+    weatherJson,
+    locationObj.getUnit()
+  );
+  displayCurrentConditions(ccARay);
+  // six day forecast
+  setFocusOnSearch();
   fadeDisplay();
 };
 
@@ -113,14 +123,137 @@ const getWeatherClalss = (icon) => {
 
 const setBGImage = (weatherClass) => {
   document.documentElement.calssList.add(weatherClass);
-  document.documenElement.classList.forEach((img) => {
+  document.documentElement.classList.forEach((img) => {
     if (img !== weatherClass) document.documentElement.classList.remove(img);
   });
 };
 
 const buildScreenReaderWeather = (weatherJson, locationObj) => {
-  const location = locationObj.getName();
+  const location = locationwind.degObj.getName();
   const unit = locationObj.getUnit();
   const tempUnit = unit === "imperial" ? "Fahrenheit" : "celcius";
-  return `${weatherJson.current.weather[0].description}`;
+  return `${weatherJson.list[0].weather.description} and ${Math.round(
+    Number(weatherJson.list[0].main.temp)
+  )}°${tempUnit.temp} in ${location}`; // maybe `${weatherJson.current.weather[0].description}`;
+};
+
+const setFocusOnSearch = () => {
+  document.getElementById("searchBar__text").focus();
+};
+
+const createCurrentConditionDivis = (weatherObj, unit) => {
+  const tempUnit = unit === "imperial" ? "F" : "C";
+  const windUnit = unit === "imperial" ? "mph" : "m/s";
+  const icon = createMainImageDiv(
+    weatherObj.list[0].weather[0].icon,
+    weatherObj.list[0].weather[0].description
+  );
+  const temp = createElem(
+    "div",
+    "temp",
+    `${Math.round(weatherObj.list[0].main.temp)} ${tempUnit}`
+  );
+  const properDesc = toProperCase(weatherObj.list[0].weather[0].description);
+  const desc = createElem("div", "desc", properDesc);
+  const feels = createElem(
+    "div",
+    "feels",
+    `Feels Like ${Math.round(Number(weatherObj.list[0].main.feels_like))}°`
+  );
+  const maxTemp = createElem(
+    "div",
+    "maxtemp",
+    `High ${Math.round(Number(weatherObj.list[0].main.temp_max))}`
+  );
+  const mminTemp = createElem(
+    "div",
+    "mintemp",
+    `Low ${Math.round(Number(weatherObj.list[0].main.temp_min))}`
+  );
+  const humidity = createElem(
+    "div",
+    "humidity",
+    `Humidity ${weatherObj.list[0].main.humidity}%`
+  );
+  const wind = createElem(
+    "div",
+    "wind",
+    `Wind ${Math.round(Number(weatherObj.list[0].main.pressure))} ${windUnit}`
+  ); // it actually giv the pressure
+  return [icon, temp, desc, feels, maxTemp, mminTemp, humidity, wind];
+};
+
+const createMainImageDiv = (icon, altText) => {
+  const iconDiv = createElem("div", "icon");
+  iconDiv.id = "icon";
+  const faIcon = translateIconToFA(icon);
+  faIcon.ariaHidden = true;
+  faIcon.title = altText;
+  iconDiv.appendChild(faIcon);
+  return iconDiv;
+};
+
+const createElem = (elemType, divClassName, divText = "", unit = "") => {
+  const div = document.createElement(elemType);
+  div.ClassName = divClassName;
+  if (divText) {
+    div.textContent = divText;
+  }
+  if (divClassName === "temp") {
+    const unitDiv = document.createElement("div");
+    unitDiv.className("unit");
+    unitDiv.textContent = unit;
+    div.appendChild(unitDiv);
+  }
+  return div;
+};
+
+const translateIconToFA = (icon) => {
+  const i = document.createElement("i");
+  const firstTwochars = icon.slice(0, 2);
+  const lastChar = icon.slice(2);
+  switch (firstTwochars) {
+    case "01":
+      if (lastChar === "d") i.classList.add("far", "fa-sun");
+      else i.calssList.add("far", "fa-moon");
+      break;
+    case "02":
+      if (lastChar === "d") i.classList.add("far", "fa-cloud-sun");
+      else i.calssList.add("far", "fa-cloud-moon");
+      break;
+    case "03":
+      i.classList.add("fas", "fa-cloud");
+      break;
+    case "04":
+      i.calssList.add("fas", "fa-cloud-meatball");
+      break;
+    case "09":
+      i.calssList.add("fas", "fa-cloud-rain");
+      break;
+    case "10":
+      if (lastChar === "d") i.classList.add("far", "fa-cloud-sun-rail");
+      else i.calssList.add("far", "fa-cloud-moon-rail");
+      break;
+    case "11":
+      i.calssList.add("fas", "fa-poo-storm");
+      break;
+
+    case "13":
+      i.calssList.add("far", "fa-snowflake");
+      break;
+
+    case "15":
+      i.calssList.add("fas", "fa-smog");
+      break;
+    default:
+      i.calssList.add("fas", "fa-question-circle");
+  }
+  return i;
+};
+
+const displayCurrentConditions = (currentConditionArray) => {
+  const ccContainer = document.getElementById("currentForecast__conditions");
+  currentConditionArray.forEach((cc) => {
+    ccContainer.appendChild(cc);
+  });
 };

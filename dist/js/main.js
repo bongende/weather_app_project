@@ -5,6 +5,7 @@ import {
   displayError,
   displayApiError,
   updateScreenReaderConfirmation,
+  updateDisplay,
 } from "./domFunctions.js";
 import {
   setLocationObject,
@@ -147,6 +148,7 @@ const submitNewLocation = async (event) => {
           ? `${coordsData.name}, ${coordsData.sys.country}`
           : coordsData.name,
       };
+      //console.log("currnet location", currentLoc);
       setLocationObject(currentLoc, myCoordsObj);
       updateDataAndDisplay(currentLoc);
     } else displayApiError(coordsData);
@@ -154,7 +156,17 @@ const submitNewLocation = async (event) => {
 };
 
 const updateDataAndDisplay = async (locationObj) => {
-  const weatherJson = await getWeatherFromCoords(locationObj);
-  console.log(weatherJson);
-  //weatherJson && updateDataAndDisplay(weatherJson, locationObj);
+  if (locationObj instanceof CurrentLocation) {
+    const weatherJson = await getWeatherFromCoords(locationObj);
+    console.log("in updateDataAndDisplay", weatherJson);
+    if (weatherJson) updateDisplay(weatherJson, locationObj);
+  } else {
+    const loc = new CurrentLocation();
+    loc.setLat(locationObj.city.coord.lat);
+    loc.setLon(locationObj.city.coord.lon);
+    loc.setName(`Lat:${loc.getLat()} Lon:${loc.getLon()}`);
+    const weatherJson = await getWeatherFromCoords(loc);
+    console.log("uptd locationObj", weatherJson);
+    if (weatherJson) updateDisplay(weatherJson, loc);
+  }
 };
